@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\backend",
+    "\\backend\\Wonga.Api",
+    "\\backend\\Wonga.Api\\Models",
+    "\\frontend"
+  ],
+  "SelectedNode": "\\backend\\Wonga.Api\\Models\\User.cs",
+  "PreviewInSolutionExplorer": false
+}

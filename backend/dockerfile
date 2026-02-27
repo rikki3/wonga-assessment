@@ -1,0 +1,16 @@
+#Build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY Wonga.Api/Wonga.Api.csproj Wonga.Api/
+RUN dotnet restore Wonga.Api/Wonga.Api.csproj
+
+COPY . . 
+RUN dotnet publish Wonga.Api/Wonga.Api.csproj -c Release -o /app/publish
+
+#Run
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY --from=build /app/publish .
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "Wonga.Api.dll"]

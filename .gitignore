@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# The .env file is being explicitly included for the purpose of the assessment
+#env/secrets
+#.env
+
+#Node
+node_modules/
+dist/
+.vite/
+
+#.NET
+**/bin/
+**/obj/
+*.user
+*.suo
+
+#Logs
+.log
