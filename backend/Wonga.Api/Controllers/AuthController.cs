@@ -11,15 +11,25 @@ namespace Wonga.Api.Controllers;
 [Route("auth")]
 public class AuthController(WongaDbContext db, JwtService jwt) : ControllerBase
 {
-    public record AuthRequest(string Email, string Password);
+    public record RegisterRequest(string Email, string Password, string FirstName, string LastName);
+    public record LoginRequest(string Email, string Password);
     public record AuthResponse(string Token, string Email);
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponse>> Register([FromBody] AuthRequest req)
+    
+    public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest req)
     {
-        var email = (req.Email ?? "").Trim().ToLowerInvariant();
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(req.Password))
-            return BadRequest("Email and password are required.");
+        var email = req.Email?.Trim().ToLowerInvariant();
+        var firstName = req.FirstName?.Trim();
+        var lastName = req.LastName?.Trim();
+
+        if (string.IsNullOrWhiteSpace(firstName)
+            || string.IsNullOrWhiteSpace(lastName)
+            || string.IsNullOrWhiteSpace(email)
+            || string.IsNullOrWhiteSpace(req.Password))
+        {
+            return BadRequest("First name, last name, email, and password are required.");
+        }
         
         var exists = await db.Users.AnyAsync(u => u.Email == email);
         if (exists) return Conflict("Email already registered.");
@@ -27,7 +37,9 @@ public class AuthController(WongaDbContext db, JwtService jwt) : ControllerBase
         var user = new User
         {
             Email = email,
-            PasswordHash = HashPassword(req.Password)
+            PasswordHash = HashPassword(req.Password),
+            FirstName = firstName,
+            LastName = lastName
         };
 
         db.Users.Add(user);
@@ -38,9 +50,12 @@ public class AuthController(WongaDbContext db, JwtService jwt) : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthResponse>> Login([FromBody] AuthRequest req)
+    public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest req)
     {
-        var email = (req.Email ?? "").Trim().ToLowerInvariant();
+        var email = req.Email?.Trim().ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(req.Password))
+            return BadRequest("Email and password are required.");
+
         var user = await db.Users.SingleOrDefaultAsync(u => u.Email == email);
         if (user is null) return Unauthorized("Invalid credentials.");
 
