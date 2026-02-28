@@ -13,16 +13,13 @@ function Protected({ children }) {
 function UpdateNavbarIfAuthed() {
     const nav = useNavigate();
     return isAuthed() ? (<>
+        <Link key="home" to="/home">Home</Link>
         <Link key="user" to="/userinfo">User Info</Link>
-        <button
-            onClick={() => {clearAuth(); nav("/"); }}
-            style={{ padding: "6px 10px" }}
-        >
-            Logout
-        </button></>
+        <Link key="logout" to="/login" onClick={() => {clearAuth(); nav("/"); }} >Logout</Link>
+        </>
     ) : ([
-        <Link key="login" to="/login">Login</Link>,
-        <Link key="register" to="/register">Register</Link>
+        <Link key="home" to="/home">Home</Link>,
+        <Link key="login" to="/login">Login</Link>
         ]);
 }
 
@@ -32,7 +29,7 @@ export default function App() {
         <div style={{ fontFamily: "system-ui", maxWidth: 720, margin: "40px auto", padding: 16}}>
             <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h1 style={{ margin: 0 }}>
-                    Wonga Assessment Test
+                    Wonga Assessment
                 </h1>
                 <nav style={{ display: "flex", gap: 12, alignItems: "center" }} >
                     <UpdateNavbarIfAuthed />
