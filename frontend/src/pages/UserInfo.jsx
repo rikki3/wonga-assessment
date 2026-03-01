@@ -44,7 +44,7 @@ export default function UserInfo() {
     if (loading) {
         return (
             <div>
-                <h2>User Info (Protected)</h2>
+                <h2>User Details (Protected)</h2>
                 <p>Loading user info...</p>
             </div>
         );
@@ -53,7 +53,7 @@ export default function UserInfo() {
     if (err) {
         return (
             <div>
-                <h2>User Info (Protected)</h2>
+                <h2>User Details (Protected)</h2>
                 <p style={{ color: "indianred" }}>{err}</p>
             </div>
         );
@@ -61,7 +61,7 @@ export default function UserInfo() {
 
     return (
         <div>
-            <h2>User Info (Protected)</h2>
+            <h2>User Details (Protected)</h2>
             <p>First name: <b>{user?.firstName}</b></p>
             <p>Last name: <b>{user?.lastName}</b></p>
             <p>Email: <b>{user?.email}</b></p>

@@ -10,11 +10,15 @@ function Protected({ children }) {
     return isAuthed() ? children : <Navigate to="/login" replace />;
 }
 
+function PublicOnly({ children }) {
+    return isAuthed() ? <Navigate to="/userinfo" replace /> : children;
+}
+
 function UpdateNavbarIfAuthed() {
     const nav = useNavigate();
     return isAuthed() ? (<>
         <Link key="home" to="/home">Home</Link>
-        <Link key="user" to="/userinfo">User Info</Link>
+        <Link key="user" to="/userinfo">My Account</Link>
         <Link key="logout" to="/login" onClick={() => {clearAuth(); nav("/"); }} >Logout</Link>
         </>
     ) : ([
@@ -40,8 +44,8 @@ export default function App() {
 
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
+                <Route path="/register" element={<PublicOnly><Register /></PublicOnly   >} />
                 <Route path="/userinfo" element={<Protected><UserInfo/></Protected>} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
