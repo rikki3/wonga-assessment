@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { apiPost } from "../api.js";
-import { setAuth } from "../auth.js";
+import { isAuthed, setAuth } from "../auth.js";
+import { CButton, CForm, CFormInput } from "@coreui/react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "@coreui/coreui/dist/css/coreui.min.css";
 
 export default function Register() {
     const nav = useNavigate();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -14,7 +18,7 @@ export default function Register() {
     async function submit(e) {
         e.preventDefault();
         setErr("");
-        try { // submit calls registration endpoint
+        try {
             const data = await apiPost("/auth/register", {email, password, firstName, lastName});
             setAuth(data.token, data.email);
             nav("/userinfo");
@@ -24,15 +28,49 @@ export default function Register() {
     }
 
     return (
-        <div>
-            <h2>Register</h2>
-            <form onSubmit={submit} style={{ display: "grid", gap: 10 }}>
-                <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-                <input placeholder="First Name" value={firstName} onChange={e => setFirstName(e.target.value)} />
-                <input placeholder="Last Name" value={lastName} onChange={e => setLastName(e.target.value)} />
-                <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-                <button type="submit">Create account</button>
-            </form>
+        <div align="center">
+            <h2 style={{ marginBottom: 16 }}>Register</h2>
+            <div style={{ border: "1px solid lightgray", padding: 16, display: "inline-block", marginBottom: 16, borderRadius: 8 }}>
+                <CForm onSubmit={submit} style={{ display: "grid", gap: 8, width: 600, textAlign: "left" }}>
+                    <CFormInput
+                        type="email"
+                        id="emailInput"
+                        label="Email address"
+                        placeholder="name@example.com"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        style={{ marginBottom: 16 }}
+                    />
+                    <CFormInput
+                        type="text"
+                        id="firstNameInput"
+                        label="First Name"
+                        placeholder="Enter your first name"
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
+                        style={{ marginBottom: 16 }}
+                    />
+                    <CFormInput
+                        type="text"
+                        id="lastNameInput"
+                        label="Last Name"
+                        placeholder="Enter your last name"
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        style={{ marginBottom: 16 }}
+                    />
+                    <CFormInput
+                        type="password"
+                        id="passwordInput"
+                        label="Password"
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        style={{ marginBottom: 16 }}
+                    />
+                    <CButton type="submit" color="primary">Create account</CButton>
+                </CForm>
+            </div>
             {err && <p style={{ color: "indianred" }}>{err}</p>}
             <p>Already have an account? <Link to="/login">Login</Link></p>
         </div>

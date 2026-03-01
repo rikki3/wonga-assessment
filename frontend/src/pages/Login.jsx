@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { apiPost } from "../api.js";
-import { setAuth } from "../auth.js";
+import { isAuthed, setAuth } from "../auth.js";
+import { CButton, CForm, CFormInput } from '@coreui/react'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import '@coreui/coreui/dist/css/coreui.min.css'
 
 export default function Login() {
     const nav = useNavigate();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [err, setErr] = useState("");
@@ -22,13 +26,29 @@ export default function Login() {
     }
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={submit} style={{ display: "grid", gap: 10 }}>
-                <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-                <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-                <button type="submit">Login</button>
-            </form>
+        <div align="center">
+            <h2 style={{ marginBottom: 16 }}>Login</h2>
+            <div style={{ border: "1px solid lightgray", padding: 16, display: "inline-block", marginBottom: 16, borderRadius: 8 }}>
+                <CForm onSubmit={submit} style={{ display: "grid", gap: 8, width: 600, textAlign: "left" }}>
+                    <CFormInput
+                        type="email"
+                        id="emailInput"
+                        label="Email address"
+                        placeholder="name@example.com"
+                        onChange={e => setEmail(e.target.value)}
+                        style={{ marginBottom: 16 }}
+                    />
+                    <CFormInput
+                        type="password"
+                        id="passwordInput"
+                        label="Password"
+                        placeholder="Enter your password"
+                        onChange={e => setPassword(e.target.value)}
+                        style={{ marginBottom: 16 }}
+                    />
+                    <CButton type="submit" color="primary">Login</CButton>
+                </CForm>
+            </div>
             {err && <p style={{ color: "indianred" }}>{err}</p>}
             <p>No account? <Link to="/register">Register</Link></p>
         </div>
