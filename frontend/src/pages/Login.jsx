@@ -33,16 +33,14 @@ export default function Login() {
                     <CFormInput
                         type="email"
                         id="emailInput"
-                        label="Email address"
-                        placeholder="name@example.com"
+                        label="Email address: "
                         onChange={e => setEmail(e.target.value)}
                         style={{ marginBottom: 16 }}
                     />
                     <CFormInput
                         type="password"
                         id="passwordInput"
-                        label="Password"
-                        placeholder="Enter your password"
+                        label="Password: "
                         onChange={e => setPassword(e.target.value)}
                         style={{ marginBottom: 16 }}
                     />

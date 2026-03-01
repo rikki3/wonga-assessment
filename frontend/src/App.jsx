@@ -17,12 +17,12 @@ function PublicOnly({ children }) {
 function UpdateNavbarIfAuthed() {
     const nav = useNavigate();
     return isAuthed() ? (<>
-        <Link key="home" to="/home">Home</Link>
+        <Link key="home" to="/">Home</Link>
         <Link key="user" to="/userinfo">My Account</Link>
         <Link key="logout" to="/login" onClick={() => {clearAuth(); nav("/"); }} >Logout</Link>
         </>
     ) : ([
-        <Link key="home" to="/home">Home</Link>,
+        <Link key="home" to="/">Home</Link>,
         <Link key="login" to="/login">Login</Link>
         ]);
 }
