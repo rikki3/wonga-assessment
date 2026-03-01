@@ -35,8 +35,7 @@ export default function Register() {
                     <CFormInput
                         type="email"
                         id="emailInput"
-                        label="Email address"
-                        placeholder="name@example.com"
+                        label="Email address: "
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         style={{ marginBottom: 16 }}
@@ -44,8 +43,7 @@ export default function Register() {
                     <CFormInput
                         type="text"
                         id="firstNameInput"
-                        label="First Name"
-                        placeholder="Enter your first name"
+                        label="First Name: "
                         value={firstName}
                         onChange={e => setFirstName(e.target.value)}
                         style={{ marginBottom: 16 }}
@@ -53,8 +51,7 @@ export default function Register() {
                     <CFormInput
                         type="text"
                         id="lastNameInput"
-                        label="Last Name"
-                        placeholder="Enter your last name"
+                        label="Last Name: "
                         value={lastName}
                         onChange={e => setLastName(e.target.value)}
                         style={{ marginBottom: 16 }}
@@ -62,8 +59,7 @@ export default function Register() {
                     <CFormInput
                         type="password"
                         id="passwordInput"
-                        label="Password"
-                        placeholder="Enter your password"
+                        label="Password: "
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         style={{ marginBottom: 16 }}
