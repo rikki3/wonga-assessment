@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wonga.Api.Data;
+using Wonga.Api.Models;
 
 namespace Wonga.Api.Controllers;
 
@@ -37,7 +38,10 @@ public class UserController(WongaDbContext db) : ControllerBase
             }
         }
 
-        if (user is null) return NotFound("User not found.");
+        if (user is null)
+        {
+            return NotFound(ApiErrorResponse.Create("user_not_found", "User not found."));
+        }
 
         return Ok(new UserDetailsResponse(user.FirstName, user.LastName, user.Email));
     }

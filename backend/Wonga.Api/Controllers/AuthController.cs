@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wonga.Api.Data;
@@ -11,33 +12,81 @@ namespace Wonga.Api.Controllers;
 [Route("auth")]
 public class AuthController(WongaDbContext db, JwtService jwt) : ControllerBase
 {
-    public record RegisterRequest(string Email, string Password, string FirstName, string LastName);
-    public record LoginRequest(string Email, string Password);
+    public class RegisterRequest
+    {
+        [Required]
+        [EmailAddress]
+        [MaxLength(256)]
+        public string Email { get; init; } = string.Empty;
+
+        [Required]
+        [MinLength(8)]
+        [MaxLength(128)]
+        public string Password { get; init; } = string.Empty;
+
+        [Required]
+        [MinLength(2)]
+        [MaxLength(100)]
+        public string FirstName { get; init; } = string.Empty;
+
+        [Required]
+        [MinLength(2)]
+        [MaxLength(100)]
+        public string LastName { get; init; } = string.Empty;
+    }
+
+    public class LoginRequest
+    {
+        [Required]
+        [EmailAddress]
+        [MaxLength(256)]
+        public string Email { get; init; } = string.Empty;
+
+        [Required]
+        [MinLength(8)]
+        [MaxLength(128)]
+        public string Password { get; init; } = string.Empty;
+    }
+
     public record AuthResponse(string Token, string Email);
 
     [HttpPost("register")]
-    
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest req)
     {
-        var email = req.Email?.Trim().ToLowerInvariant();
-        var firstName = req.FirstName?.Trim();
-        var lastName = req.LastName?.Trim();
+        var email = (req.Email ?? string.Empty).Trim().ToLowerInvariant();
+        var firstName = (req.FirstName ?? string.Empty).Trim();
+        var lastName = (req.LastName ?? string.Empty).Trim();
+        var password = req.Password ?? string.Empty;
 
         if (string.IsNullOrWhiteSpace(firstName)
             || string.IsNullOrWhiteSpace(lastName)
             || string.IsNullOrWhiteSpace(email)
-            || string.IsNullOrWhiteSpace(req.Password))
+            || string.IsNullOrWhiteSpace(password))
         {
-            return BadRequest("First name, last name, email, and password are required.");
+            var validationErrors = new Dictionary<string, string[]>();
+
+            if (string.IsNullOrWhiteSpace(firstName))
+                validationErrors["firstName"] = ["First name is required."];
+            if (string.IsNullOrWhiteSpace(lastName))
+                validationErrors["lastName"] = ["Last name is required."];
+            if (string.IsNullOrWhiteSpace(email))
+                validationErrors["email"] = ["Email is required."];
+            if (string.IsNullOrWhiteSpace(password))
+                validationErrors["password"] = ["Password is required."];
+
+            return BadRequest(ApiErrorResponse.Validation(validationErrors));
         }
         
         var exists = await db.Users.AnyAsync(u => u.Email == email);
-        if (exists) return Conflict("Email already registered.");
+        if (exists)
+        {
+            return Conflict(ApiErrorResponse.Create("email_exists", "Email already registered."));
+        }
 
         var user = new User
         {
             Email = email,
-            PasswordHash = HashPassword(req.Password),
+            PasswordHash = HashPassword(password),
             FirstName = firstName,
             LastName = lastName
         };
@@ -52,15 +101,27 @@ public class AuthController(WongaDbContext db, JwtService jwt) : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest req)
     {
-        var email = req.Email?.Trim().ToLowerInvariant();
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(req.Password))
-            return BadRequest("Email and password are required.");
+        var email = (req.Email ?? string.Empty).Trim().ToLowerInvariant();
+        var password = req.Password ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            var validationErrors = new Dictionary<string, string[]>();
+
+            if (string.IsNullOrWhiteSpace(email))
+                validationErrors["email"] = ["Email is required."];
+            if (string.IsNullOrWhiteSpace(password))
+                validationErrors["password"] = ["Password is required."];
+
+            return BadRequest(ApiErrorResponse.Validation(validationErrors));
+        }
 
         var user = await db.Users.SingleOrDefaultAsync(u => u.Email == email);
-        if (user is null) return Unauthorized("Invalid credentials.");
+        if (user is null)
+            return Unauthorized(ApiErrorResponse.Create("invalid_credentials", "Invalid credentials."));
 
-        if (!VerifyPassword(req.Password, user.PasswordHash))
-            return Unauthorized("Invalid credentials.");
+        if (!VerifyPassword(password, user.PasswordHash))
+            return Unauthorized(ApiErrorResponse.Create("invalid_credentials", "Invalid credentials."));
 
         var token = jwt.CreateToken(user);
         return Ok(new AuthResponse(token, user.Email));

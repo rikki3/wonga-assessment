@@ -16,11 +16,13 @@ public class AuthControllerTests
         await using var db = CreateDbContext();
         var controller = new AuthController(db, CreateJwtService());
 
-        var req = new AuthController.RegisterRequest(
-            Email: "rickesh@roguegamestudio.space",
-            Password: "roguegamestudio",
-            FirstName: "Rickesh",
-            LastName: "Singh");
+        var req = new AuthController.RegisterRequest
+        {
+            Email = "rickesh@roguegamestudio.space",
+            Password = "roguegamestudio",
+            FirstName = "Rickesh",
+            LastName = "Singh"
+        };
 
         // Act
         var result = await controller.Register(req);
@@ -44,11 +46,13 @@ public class AuthControllerTests
         await using var db = CreateDbContext();
         var controller = new AuthController(db, CreateJwtService());
 
-        var req = new AuthController.RegisterRequest(
-            Email: "rickesh@roguegamestudio.space",
-            Password: "roguegamestudio",
-            FirstName: "Rickesh",
-            LastName: "Singh");
+        var req = new AuthController.RegisterRequest
+        {
+            Email = "rickesh@roguegamestudio.space",
+            Password = "roguegamestudio",
+            FirstName = "Rickesh",
+            LastName = "Singh"
+        };
 
         _ = await controller.Register(req);
         var result = await controller.Register(req);
@@ -62,11 +66,13 @@ public class AuthControllerTests
         await using var db = CreateDbContext();
         var controller = new AuthController(db, CreateJwtService());
 
-        var req = new AuthController.RegisterRequest(
-            Email: "rickesh@roguegamestudio.space",
-            Password: "roguegamestudio",
-            FirstName: "Rickesh",
-            LastName: "");
+        var req = new AuthController.RegisterRequest
+        {
+            Email = "rickesh@roguegamestudio.space",
+            Password = "roguegamestudio",
+            FirstName = "Rickesh",
+            LastName = ""
+        };
 
         var result = await controller.Register(req);
 
@@ -79,17 +85,21 @@ public class AuthControllerTests
         await using var db = CreateDbContext();
         var controller = new AuthController(db, CreateJwtService());
 
-        var registerReq = new AuthController.RegisterRequest(
-            Email: "rickesh@roguegamestudio.space",
-            Password: "roguegamestudio",
-            FirstName: "Rickesh",
-            LastName: "Singh");
+        var registerReq = new AuthController.RegisterRequest
+        {
+            Email = "rickesh@roguegamestudio.space",
+            Password = "roguegamestudio",
+            FirstName = "Rickesh",
+            LastName = "Singh"
+        };
 
         _ = await controller.Register(registerReq);
 
-        var loginReq = new AuthController.LoginRequest(
-            Email: "rickesh@roguegamestudio.space",
-            Password: "roguegamestudio");
+        var loginReq = new AuthController.LoginRequest
+        {
+            Email = "rickesh@roguegamestudio.space",
+            Password = "roguegamestudio"
+        };
 
         var result = await controller.Login(loginReq);
 
@@ -106,17 +116,21 @@ public class AuthControllerTests
         await using var db = CreateDbContext();
         var controller = new AuthController(db, CreateJwtService());
 
-        var registerReq = new AuthController.RegisterRequest(
-            Email: "rickesh@roguegamestudio.space",
-            Password: "roguegamestudio",
-            FirstName: "Rickesh",
-            LastName: "Singh");
+        var registerReq = new AuthController.RegisterRequest
+        {
+            Email = "rickesh@roguegamestudio.space",
+            Password = "roguegamestudio",
+            FirstName = "Rickesh",
+            LastName = "Singh"
+        };
 
         _ = await controller.Register(registerReq);
 
-        var loginReq = new AuthController.LoginRequest(
-            Email: "rickesh@roguegamestudio.space",
-            Password: "studioroguegame");
+        var loginReq = new AuthController.LoginRequest
+        {
+            Email = "rickesh@roguegamestudio.space",
+            Password = "studioroguegame"
+        };
 
         var result = await controller.Login(loginReq);
 

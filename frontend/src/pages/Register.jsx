@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { apiPost } from "../api.js";
-import { isAuthed, setAuth } from "../auth.js";
+import { setAuth } from "../auth.js";
 import { CButton, CForm, CFormInput } from "@coreui/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@coreui/coreui/dist/css/coreui.min.css";

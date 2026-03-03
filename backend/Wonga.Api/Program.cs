@@ -1,8 +1,10 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Wonga.Api.Data;
+using Wonga.Api.Models;
 using Wonga.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,18 +17,41 @@ var conn = builder.Configuration.GetConnectionString("Default")
 builder.Services.AddDbContext<WongaDbContext>(opt => opt.UseNpgsql(conn));
 builder.Services.AddSingleton<JwtService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(kvp => kvp.Value is { Errors.Count: > 0 })
+                .ToDictionary(
+                    kvp => Program.ToCamelCaseField(kvp.Key),
+                    kvp => kvp.Value!.Errors
+                        .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Invalid value." : e.ErrorMessage)
+                        .ToArray());
+
+            return new BadRequestObjectResult(ApiErrorResponse.Validation(errors));
+        };
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS for local/dev
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()
+    ?.Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .Select(origin => origin.Trim().TrimEnd('/'))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray()
+    ?? ["http://localhost:3000", "http://localhost:5173"];
+
+// CORS restricted to known web origins
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("AllowWeb", p =>
-        p.AllowAnyHeader()
+        p.WithOrigins(allowedOrigins)
+         .AllowAnyHeader()
          .AllowAnyMethod()
-         .AllowCredentials()
-         .SetIsOriginAllowed(_ => true)); // ok for assessment/dev
+         .AllowCredentials());
 });
 
 // JWT auth
@@ -56,7 +81,14 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<WongaDbContext>();
-    db.Database.Migrate();
+    if (db.Database.IsRelational())
+    {
+        db.Database.Migrate();
+    }
+    else
+    {
+        db.Database.EnsureCreated();
+    }
 }
 
 app.UseSwagger();
@@ -70,3 +102,24 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program
+{
+    public static string ToCamelCaseField(string rawKey)
+    {
+        if (string.IsNullOrWhiteSpace(rawKey))
+        {
+            return "request";
+        }
+
+        var key = rawKey.Replace("$.", string.Empty);
+        var lastSegment = key.Split('.', StringSplitOptions.RemoveEmptyEntries).LastOrDefault() ?? "request";
+
+        if (lastSegment.Length == 1)
+        {
+            return lastSegment.ToLowerInvariant();
+        }
+
+        return char.ToLowerInvariant(lastSegment[0]) + lastSegment[1..];
+    }
+}
